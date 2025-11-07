@@ -27,6 +27,29 @@ public class ControladorInventario {
 
         return buscarLibroPorISBNRecursivo(ISBN, indice + 1);
     }
+    public ArrayList<Libro> buscarLibrosPorAutor(String autor, int indice, ArrayList<Libro> resultados) {
+        if (indice >= inventario.size()) {
+            return resultados;
+        }
+
+        Libro libro = inventario.get(indice);
+        if (libro.getAutor().toLowerCase().contains(autor.toLowerCase())) {
+            resultados.add(libro);
+        }
+        return buscarLibrosPorAutor(autor, indice + 1, resultados);
+    }
+    public ArrayList<Libro> buscarLibrosPorTitulo(String titulo, int indice, ArrayList<Libro> resultados) {
+        if (indice >= inventario.size()) {
+            return resultados;
+        }
+
+        Libro libro = inventario.get(indice);
+        if (libro.getTitulo().toLowerCase().contains(titulo.toLowerCase())) {
+            resultados.add(libro);
+        }
+        return buscarLibrosPorTitulo(titulo, indice + 1, resultados);
+    }
+
 
     public boolean registrarLibro(Libro libro) {
         if (buscarLibroPorISBN(libro.getISBN()) != null) {

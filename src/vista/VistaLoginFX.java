@@ -54,14 +54,14 @@ public class VistaLoginFX {
         );
 
         Scene escena = new Scene(contenedor, 500, 500);
-        primaryStage.setTitle("Login");
+        primaryStage.setTitle("BIBLIOTEC");
         primaryStage.setScene(escena);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
 
     private Label crearTitulo() {
-        Label titulo = new Label("LOGIN");
+        Label titulo = new Label("LOGIN BIBLIOTEC");
         titulo.setFont(Font.font("System", FontWeight.BOLD, 24));
         titulo.setTextFill(Color.web("#2c3e50"));
         return titulo;

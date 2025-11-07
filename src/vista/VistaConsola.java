@@ -32,15 +32,14 @@ public class VistaConsola {
     }
 
     private void mostrarEncabezado() {
-        System.out.println("SISTEMA DE INVENTARIO BIBLIOTECA");
-        System.out.println("Usuario: " + usuario.getNombreCompleto() + " (" + usuario.getRol() + ")");
+        System.out.println("INVENTARIO BIBLIOTECA");
     }
 
     private void mostrarOpciones() {
         System.out.println("\n1. Registrar libro");
         System.out.println("2. Actualizar stock");
         System.out.println("3. Consultar inventario");
-        System.out.println("4. Buscar libro por ISBN");
+        System.out.println("4. Buscar libro");
         System.out.println("5. Generar reportes");
         System.out.println("6. Eliminar libro");
         System.out.println("7. Salir");
@@ -92,9 +91,9 @@ public class VistaConsola {
         Libro libro = new Libro(titulo, autor, isbn, stock);
 
         if (controlador.registrarLibro(libro)) {
-            System.out.println("\n Libro registrado exitosamente.");
+            System.out.println("\nLibro registrado exitosamente.");
         } else {
-            System.out.println("\n Error: El libro ya existe (ISBN duplicado).");
+            System.out.println("\nError: El libro ya existe.");
         }
     }
 
@@ -112,14 +111,14 @@ public class VistaConsola {
         System.out.println("INVENTARIO COMPLETO");
 
         if (controlador.estaVacio()) {
-            System.out.println("\n No hay libros registrados.");
+            System.out.println("\nNo hay libros registrados.");
             return;
         }
 
         ArrayList<Libro> inventario = controlador.obtenerInventario();
         int totalEjemplares = controlador.contarTotalLibros(0);
 
-        System.out.println("\n Total de títulos: " + inventario.size());
+        System.out.println("\nTotal de títulos: " + inventario.size());
         System.out.println("Total de ejemplares: " + totalEjemplares);
         System.out.println("\n" + "─".repeat(60));
 
@@ -130,27 +129,84 @@ public class VistaConsola {
     }
 
     private void buscarLibro() {
-
         System.out.println("BUSCAR LIBRO");
+        System.out.println("Buscar por:");
+        System.out.println("1. ISBN");
+        System.out.println("2. Autor");
+        System.out.println("3. Título");
+        System.out.print("\nSeleccione opción: ");
 
+        int opcion = entrada.nextInt();
+        entrada.nextLine();
+
+        switch (opcion) {
+            case 1:
+                buscarPorISBN();
+                break;
+            case 2:
+                buscarPorAutor();
+                break;
+            case 3:
+                buscarPorTitulo();
+                break;
+            default:
+                System.out.println("\nOpción inválida.");
+        }
+    }
+
+    private void buscarPorISBN() {
         String isbn = solicitarDato("ISBN");
         Libro libro = controlador.buscarLibroPorISBN(isbn);
 
         if (libro != null) {
-            System.out.println("\n Libro encontrado:");
+            System.out.println("\nLibro encontrado:");
             System.out.println("\n" + "─".repeat(60));
             System.out.println(libro.obtenerInformacion());
             System.out.println("─".repeat(60));
         } else {
-            System.out.println("\n Libro no encontrado.");
+            System.out.println("\nLibro no encontrado.");
         }
     }
+
+    private void buscarPorAutor() {
+        String autor = solicitarDato("Autor");
+        ArrayList<Libro> resultados = controlador.buscarLibrosPorAutor(autor, 0, new ArrayList<>());
+
+        if (resultados.isEmpty()) {
+            System.out.println("\nNo se encontraron libros de ese autor.");
+        } else {
+            System.out.println("\nLibros encontrados (" + resultados.size() + "):");
+            System.out.println("─".repeat(60));
+            for (Libro libro : resultados) {
+                System.out.println(libro.obtenerInformacion());
+                System.out.println("─".repeat(60));
+            }
+        }
+    }
+
+    private void buscarPorTitulo() {
+        String titulo = solicitarDato("Título");
+        ArrayList<Libro> resultados = controlador.buscarLibrosPorTitulo(titulo, 0, new ArrayList<>());
+
+        if (resultados.isEmpty()) {
+            System.out.println("\nNo se encontraron libros con ese título.");
+        } else {
+            System.out.println("\nLibros encontrados (" + resultados.size() + "):");
+            System.out.println("─".repeat(60));
+            for (Libro libro : resultados) {
+                System.out.println(libro.obtenerInformacion());
+                System.out.println("─".repeat(60));
+            }
+        }
+    }
+
+
 
     private void generarReportes() {
         System.out.println("GENERAR REPORTES");
 
         if (controlador.estaVacio()) {
-            System.out.println("\n No hay datos en el inventario.");
+            System.out.println("\nNo hay datos en el inventario.");
             return;
         }
 
@@ -162,11 +218,11 @@ public class VistaConsola {
     private void mostrarReporteBajoStock() {
         ArrayList<Libro> bajoStock = controlador.obtenerLibrosBajoStock(0, new ArrayList<>());
 
-        System.out.println("\n LIBROS CON BAJO STOCK (<=3):");
+        System.out.println("\nLIBROS CON BAJO STOCK (<=3):");
         System.out.println("─".repeat(60));
 
         if (bajoStock.isEmpty()) {
-            System.out.println(" Ningún libro con bajo stock.");
+            System.out.println("Ningún libro con bajo stock.");
         } else {
             for (Libro libro : bajoStock) {
                 System.out.println( libro.getTitulo() + " - Stock: " + libro.getStock());
@@ -179,13 +235,13 @@ public class VistaConsola {
         Libro menor = controlador.encontrarLibroMenorStock(0, null);
 
         if (mayor != null) {
-            System.out.println("\n LIBRO CON MAYOR STOCK:");
+            System.out.println("\nLIBRO CON MAYOR STOCK:");
             System.out.println("─".repeat(60));
             System.out.println(mayor.getTitulo() + " - Stock: " + mayor.getStock());
         }
 
         if (menor != null) {
-            System.out.println("\n LIBRO CON MENOR STOCK:");
+            System.out.println("\nLIBRO CON MENOR STOCK:");
             System.out.println("─".repeat(60));
             System.out.println(menor.getTitulo() + " - Stock: " + menor.getStock());
         }
@@ -193,7 +249,7 @@ public class VistaConsola {
 
     private void mostrarTotalEjemplares() {
         int totalEjemplares = controlador.contarTotalLibros(0);
-        System.out.println("\n TOTAL DE EJEMPLARES EN INVENTARIO:");
+        System.out.println("\nTOTAL DE EJEMPLARES EN INVENTARIO:");
         System.out.println("─".repeat(60));
         System.out.println(totalEjemplares + " ejemplares");
     }
@@ -202,7 +258,7 @@ public class VistaConsola {
         System.out.println("ELIMINAR LIBRO");
 
         if (!usuario.esAdmin()) {
-            System.out.println("\n Acceso denegado. Solo ADMIN puede eliminar libros.");
+            System.out.println("\nAcceso denegado. Solo ADMIN puede eliminar libros.");
             return;
         }
 
@@ -210,7 +266,7 @@ public class VistaConsola {
 
         Libro libro = controlador.buscarLibroPorISBN(isbn);
         if (libro == null) {
-            System.out.println("\n Libro no encontrado.");
+            System.out.println("\nLibro no encontrado.");
             return;
         }
 
@@ -223,12 +279,12 @@ public class VistaConsola {
 
         if (confirmacion.equalsIgnoreCase("SI")) {
             if (controlador.eliminarLibro(isbn)) {
-                System.out.println("\n Libro eliminado correctamente.");
+                System.out.println("\nLibro eliminado correctamente.");
             } else {
-                System.out.println("\n No se pudo eliminar el libro.");
+                System.out.println("\nNo se pudo eliminar el libro.");
             }
         } else {
-            System.out.println("\n Eliminación cancelada.");
+            System.out.println("\nEliminación cancelada.");
         }
     }
 

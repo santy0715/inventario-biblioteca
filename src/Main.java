@@ -10,7 +10,7 @@ public class Main {
     }
 
     private static void mostrarBienvenida() {
-        System.out.println("INVENTARIO BIBLIOTECA");
+        System.out.println("BIBLIOTEC");
     }
 
     private static void iniciarSistema() {

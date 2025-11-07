@@ -42,7 +42,7 @@ public class VistaPrincipalFX {
 
         Scene scene = new Scene(root, 1000, 650);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("INVENTARIO BIBLIOTECA");
+        primaryStage.setTitle("BIBLIOTEC");
         primaryStage.show();
         cargarDatos();
     }
@@ -52,12 +52,11 @@ public class VistaPrincipalFX {
         header.setPadding(new Insets(15));
         header.setStyle("-fx-background-color: #2c3e50;");
 
-        Label titulo = new Label("SISTEMA DE INVENTARIO BIBLIOTECA");
+        Label titulo = new Label("INVENTARIO BIBLIOTECA");
         titulo.setFont(Font.font("System", FontWeight.BOLD, 20));
         titulo.setTextFill(Color.WHITE);
 
-        Label usuario = new Label("Usuario: " + usuarioActual.getNombreCompleto() +
-                " (" + usuarioActual.getRol() + ")");
+        Label usuario = new Label("Usuario: " + usuarioActual.getNombreCompleto() );
         usuario.setFont(Font.font("System", 12));
         usuario.setTextFill(Color.web("#ecf0f1"));
 
@@ -80,7 +79,7 @@ public class VistaPrincipalFX {
         Button btnActualizar = crearBotonMenu("Actualizar Stock");
         Button btnBuscar = crearBotonMenu("Buscar Libro");
         Button btnReportes = crearBotonMenu("Generar Reportes");
-        Button btnEliminar = crearBotonMenu("🗑Eliminar Libro");
+        Button btnEliminar = crearBotonMenu("Eliminar Libro");
         Button btnCerrarSesion = crearBotonMenu("Cerrar Sesión");
 
         btnRegistrar.setOnAction(e -> registrarLibro());
@@ -139,7 +138,6 @@ public class VistaPrincipalFX {
         Label titulo = new Label("INVENTARIO DE LIBROS");
         titulo.setFont(Font.font("System", FontWeight.BOLD, 18));
 
-        // Configurar tabla
         tablaLibros = new TableView<>();
         datosTabla = FXCollections.observableArrayList();
 
@@ -281,27 +279,114 @@ public class VistaPrincipalFX {
     }
 
     private void buscarLibro() {
+        Dialog<String> dialogTipo = new Dialog<>();
+        dialogTipo.setTitle("Buscar Libro");
+        dialogTipo.setHeaderText("Seleccione el tipo de búsqueda");
+
+        ButtonType btnISBN = new ButtonType("Por ISBN", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnAutor = new ButtonType("Por Autor", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnTitulo = new ButtonType("Por Título", ButtonBar.ButtonData.OK_DONE);
+        dialogTipo.getDialogPane().getButtonTypes().addAll(btnISBN, btnAutor, btnTitulo, ButtonType.CANCEL);
+
+        dialogTipo.setResultConverter(dialogButton -> {
+            if (dialogButton == btnISBN) return "ISBN";
+            if (dialogButton == btnAutor) return "AUTOR";
+            if (dialogButton == btnTitulo) return "TITULO";
+            return null;
+        });
+
+        Optional<String> resultado = dialogTipo.showAndWait();
+        resultado.ifPresent(tipo -> {
+            switch (tipo) {
+                case "ISBN":
+                    buscarPorISBN();
+                    break;
+                case "AUTOR":
+                    buscarPorAutor();
+                    break;
+                case "TITULO":
+                    buscarPorTitulo();
+                    break;
+            }
+        });
+    }
+
+    private void buscarPorISBN() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Buscar Libro");
+        dialog.setTitle("Buscar por ISBN");
         dialog.setHeaderText("Ingrese el ISBN del libro");
         dialog.setContentText("ISBN:");
 
-        Optional<String> resultado = dialog.showAndWait();
-        if (resultado.isPresent()) {
-            String isbn = resultado.get();
+        dialog.showAndWait().ifPresent(isbn -> {
             Libro libro = controlador.buscarLibroPorISBN(isbn);
-
             if (libro != null) {
-                String informacion = "INFORMACIÓN DEL LIBRO\n\n" +
-                        "Título: " + libro.getTitulo() + "\n" +
-                        "Autor: " + libro.getAutor() + "\n" +
-                        "ISBN: " + libro.getISBN() + "\n" +
-                        "Stock: " + libro.getStock();
-                mostrarMensaje("Libro Encontrado", informacion, Alert.AlertType.INFORMATION);
+                StringBuilder info = new StringBuilder(" LIBRO ENCONTRADO\n\n");
+                info.append("Título: ").append(libro.getTitulo()).append("\n");
+                info.append("Autor: ").append(libro.getAutor()).append("\n");
+                info.append("ISBN: ").append(libro.getISBN()).append("\n");
+                info.append("Stock: ").append(libro.getStock()).append("\n");
+                if (libro.necesitaReabastecimiento()) {
+                    info.append(" Necesita reabastecimiento\n");
+                }
+                mostrarMensaje("Libro Encontrado", info.toString(), Alert.AlertType.INFORMATION);
             } else {
                 mostrarMensaje("No Encontrado", "No existe un libro con ese ISBN", Alert.AlertType.WARNING);
             }
-        }
+        });
+    }
+
+    private void buscarPorAutor() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Buscar por Autor");
+        dialog.setHeaderText("Ingrese el nombre del autor");
+        dialog.setContentText("Autor:");
+
+        dialog.showAndWait().ifPresent(autor -> {
+            ArrayList<Libro> resultados = controlador.buscarLibrosPorAutor(autor, 0, new ArrayList<>());
+            if (resultados.isEmpty()) {
+                mostrarMensaje("No Encontrado", "No se encontraron libros de ese autor", Alert.AlertType.WARNING);
+            } else {
+                StringBuilder info = new StringBuilder(" LIBROS ENCONTRADOS (" + resultados.size() + ")\n\n");
+                for (Libro libro : resultados) {
+                    info.append("Título: ").append(libro.getTitulo()).append("\n");
+                    info.append("Autor: ").append(libro.getAutor()).append("\n");
+                    info.append("ISBN: ").append(libro.getISBN()).append("\n");
+                    info.append("Stock: ").append(libro.getStock()).append("\n");
+                    if (libro.necesitaReabastecimiento()) {
+                        info.append("Necesita reabastecimiento\n");
+                    }
+                }
+                mostrarMensaje("Resultados", info.toString(), Alert.AlertType.INFORMATION);
+            }
+        });
+    }
+
+    private void buscarPorTitulo() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Buscar por Título");
+        dialog.setHeaderText("Ingrese el título del libro");
+        dialog.setContentText("Título:");
+
+        dialog.showAndWait().ifPresent(titulo -> {
+            ArrayList<Libro> resultados = controlador.buscarLibrosPorTitulo(titulo, 0, new ArrayList<>());
+            if (resultados.isEmpty()) {
+                mostrarMensaje("No Encontrado", "No se encontraron libros con ese título", Alert.AlertType.WARNING);
+            } else {
+                StringBuilder info = new StringBuilder(" LIBROS ENCONTRADOS (" + resultados.size() + ")\n\n");
+                for (Libro libro : resultados) {
+                    info.append("\n");
+                    info.append("Título: ").append(libro.getTitulo()).append("\n");
+                    info.append("Autor: ").append(libro.getAutor()).append("\n");
+                    info.append("ISBN: ").append(libro.getISBN()).append("\n");
+                    info.append("Stock: ").append(libro.getStock()).append("\n");
+                    if (libro.necesitaReabastecimiento()) {
+                        info.append("  Necesita reabastecimiento\n");
+                    }
+                    info.append("\n\n");
+                }
+                mostrarMensaje("Resultados", info.toString(), Alert.AlertType.INFORMATION);
+            }
+        });
     }
 
     private void generarReportes() {

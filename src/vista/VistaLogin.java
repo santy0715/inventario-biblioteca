@@ -45,7 +45,7 @@ public class VistaLogin {
     }
 
     private String solicitarUsuario() {
-        System.out.print("\n Usuario: ");
+        System.out.print("\nUsuario: ");
         return entrada.nextLine();
     }
 
@@ -56,8 +56,7 @@ public class VistaLogin {
 
     private Usuario mostrarBienvenida() {
         Usuario usuario = controlador.getUsuarioActual();
-        System.out.println("\n Bienvenido, " + usuario.getNombreCompleto() + "!");
-        System.out.println("Rol: " + usuario.getRol());
+        System.out.println("\nBienvenido, " + usuario.getNombreCompleto() + "!");
         return usuario;
     }
 
