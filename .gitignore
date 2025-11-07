@@ -1,0 +1,10 @@
+*.class
+*.log
+*.jar
+*.exe
+out/
+.idea/
+*.iml
+libros.txt
+usuarios.txt
+.vscode/
