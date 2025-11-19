@@ -1,0 +1,18 @@
+Cien años de soledad,Gabriel García Márquez,0001,6
+1984,George Orwell,0002,23
+Don Quijote de la Mancha,Miguel de Cervantes,0003,2
+El Principito,Antoine de Saint-Exupéry,0004,87
+La Odisea,Homero,0005,50
+Orgullo y prejuicio,Jane Austen,0006,6
+Moby Dick,Herman Melville,0007,69
+El Alquimista,Paulo Coelho,0008,10
+La Metamorfosis,Franz Kafka,0009,5
+Siddhartha,Hermann Hesse,0010,7
+Cumbres Borrascosas,Emily Brontë,0011,4
+El Retrato de Dorian Gray,Oscar Wilde,0012,3
+La Divina Comedia,Dante Alighieri,0013,6
+El Señor de los Anillos,J.R.R. Tolkien,0014,8
+Crónica de una Muerte Anunciada,Gabriel García Márquez,0015,5
+Ficciones,Jorge Luis Borges,0016,9
+El Viejo y el Mar,Ernest Hemingway,0017,7
+las lavadas de un motero,santiago rodriguez,0018,7
